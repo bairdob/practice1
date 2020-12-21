@@ -427,8 +427,8 @@ int main(){
     //i1.show_gist();
     //cout << i1.my_Offset(pFile);
     
-    FILE* pImg1 = fopen("/Users/bair/Desktop/MaximovCpp/practice1/cat/image/cat_grey1.bmp", "rb");
-    FILE* pImg2 = fopen("/Users/bair/Desktop/MaximovCpp/practice1/cat/image/mouse1.bmp", "rb");
+    FILE* pImg1 = fopen("/Users/bair/Desktop/MaximovCpp/practice1/image/cat_grey1.bmp", "rb");
+    FILE* pImg2 = fopen("/Users/bair/Desktop/MaximovCpp/practice1/image/mouse1.bmp", "rb");
     image cat, mouse;
     angle rectangle[9];
     cat.fill(pImg1);  mouse.fill(pImg2); 

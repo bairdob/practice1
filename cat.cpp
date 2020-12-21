@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <optional>
+#include <vector>
 using namespace std;
 const int SIZE = 64;
 
@@ -387,6 +389,34 @@ void fill_angle(angle *coord, int width, int height){
  int getColor(image &p, int x, int y){
     return p.color[x][y];
  }
+optional<pair<int, int>> getSubmatrixIndices(vector<vector<int>> A, vector<vector<int>> B) {
+    bool found = false;
+    size_t bigMatrixSize = A.size();
+    size_t smallMatrixSize = B.size();
+    size_t deltaSize = bigMatrixSize - smallMatrixSize;
+
+    for (int xOffset = 0; xOffset <= deltaSize ; xOffset++) {
+        for (int yOffset = 0; yOffset <= deltaSize ; yOffset++) {
+            found = true;
+
+            for (int i = 0; i < smallMatrixSize; i++) {
+                for (int j = 0; j < smallMatrixSize; j++) {
+                    if (A[i][j] != B[i][j]) {
+                        found = false;
+                        break;
+                    }
+                }
+                if (!found)
+                    break;
+            }
+
+            if (found) {
+                return pair<int, int>(xOffset, yOffset);
+            }
+        }
+    }
+    return nullopt;
+}
 
 int main(){
 
@@ -397,19 +427,17 @@ int main(){
     //i1.show_gist();
     //cout << i1.my_Offset(pFile);
     
-    FILE* pImg1 = fopen("/Users/bair/Desktop/MaximovCpp/practice1/image/cat_grey1.bmp", "rb");
-    FILE* pImg2 = fopen("/Users/bair/Desktop/MaximovCpp/practice1/image/mouse1.bmp", "rb");
+    FILE* pImg1 = fopen("/Users/bair/Desktop/MaximovCpp/practice1/cat/image/cat_grey1.bmp", "rb");
+    FILE* pImg2 = fopen("/Users/bair/Desktop/MaximovCpp/practice1/cat/image/mouse1.bmp", "rb");
     image cat, mouse;
-    int coord[18];
     angle rectangle[9];
     cat.fill(pImg1);  mouse.fill(pImg2); 
 
-    // cat.show();
-    // mouse.show();
+    //cat.show();
+    //mouse.show();
     //cat.show_gist_data();
     //mouse.show_gist_data();
-    //mouse.show_o_gist_data();
-    //cout << match(cat.Gist,mouse.Gist);
+    //mouse.showcolor();
 
     fill_angle(rectangle, getWidth(cat), getHeight(cat));
        for (int i = 0;i < 9;i++ ){
@@ -423,7 +451,6 @@ int main(){
     //     << rectangle[i].bottom_right.x <<  ","<< rectangle[i].bottom_right.y <<"\t";
     // }
 
-
     // cout << endl; 
     // int cnt = 0;
     // int p = 0;
@@ -433,81 +460,32 @@ int main(){
     // }
     // cout << "all = " << cnt << endl;
 
-   // cout << is_match(rectangle[0].gist, mouse.Gist);
+    //cout << is_match(rectangle[0].gist, mouse.Gist);
 
     // for (int i = 0; i< 9; i++)
     //         if (is_match(rectangle[i].gist, mouse.Gist)) cout << i + 1 << " ";
     
-
-    // int k,l;//строка столбец
-    // bool bad;
-    // for (int i = 0; i < getWidth(cat)-getWidth(mouse) + 1;i++){
-    //     for (int j = 0; j < getHeight(cat) - getHeight(mouse); j++){
-    //         if (getColor(cat, i , j) == getColor(mouse, 0, 0)) {
-    //             bad = false;
-    //             k = 0;
-    //             do {
-    //                 l = 0 ; 
-    //                 do {
-    //                     if (getColor(cat,i+k,j+l) != getColor(mouse,k,l)) bad = true;
-    //                     //bad = getColor(cat,i+k,j+l) != getColor(mouse,k,l);
-    //                     l++;
-    //                 } while (l > getHeight(mouse) || bad);
-    //                 k++;
-    //             } while (k >getWidth(mouse) || bad);
-    //             if (!bad) cout << i << ","<< j << " ";
-    //         }
-    //     }
-    // }
-
-
-    const int n1 = getWidth(cat);
-    const int n2 = getHeight(mouse); 
-    const int m1 = getWidth(cat);
-    const int m2 = getHeight(mouse);
-
-    // int k,l;//строка столбец
-    // bool bad;
-    // for (int i = 0; i < n1 - n2 + 1;i++){
-    //     for (int j = 0; j < m1-m2+1; j++){
-    //         if (getColor(cat, i , j) == getColor(mouse, 0, 0)) {
-    //             bad = false;
-    //             k = 0;
-    //             do {
-    //                 l = 0 ; 
-    //                 do {
-    //                     if (getColor(cat,i+k,j+l) != getColor(mouse,k,l)) bad = true;
-    //                     l++;
-    //                 } while (l > 2 || bad);
-    //                 k++;
-    //             } while (k >2 || bad);
-    //             if (!bad) cout << i << ","<< j << " ";
-    //         }
-    //     }
-    // }
-
-    int k,l;//строка, столбец
-    bool bad;
-    for (int i = 0; i < n1 - n2;i++){
-        for (int j = 0; j < m1-m2; j++){
-            if (getColor(cat, i , j) == getColor(mouse, 0, 0)) {
-                bad = false;
-                k = 0;
-                do {
-                    l = 0 ; 
-                    do {
-                        
-                        if (getColor(cat,i+k,j+l) != getColor(mouse,k,l)) bad = true;
-                        l++;
-                    } while (l > m2 && !bad);
-                    k++;
-                   if (getColor(cat,i+k,j+l) != getColor(mouse,k,l)) bad = true;
-                } while (k >n2 && !bad);
-            if (!bad) cout << i +1<< ","<< j+1 << " ";        
+    int temp[64]={0};
+    bool found = false;
+    int deltaSize = getHeight(cat) - getHeight(mouse);
+    for (int xOffset = 0; xOffset <= deltaSize ; xOffset++) {
+        for (int yOffset = 0; yOffset <= deltaSize ; yOffset++) {
+            found = true;
+            for (int i = 0; i < getHeight(mouse); i++) {
+                for (int j = 0; j < getHeight(mouse); j++) {
+                    temp[cat.color[i+xOffset][j+yOffset]]++;
+                    if (temp[cat.color[i+xOffset][j+yOffset]]++ != mouse.color[i][j]) {
+                        found = false;
+                        break;
+                    }
+                }
+                if (!found)
+                    break;
             }
-        
+            if (found) {
+                cout << "asda";
+            }
         }
-        
     }
     return 0;
 }
